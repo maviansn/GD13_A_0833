@@ -1,4 +1,4 @@
-package com.example.gd8_a_0833.adapters
+package com.example.gd13_a_0833.adapters
 
 import android.content.Context
 import android.content.Intent
@@ -8,11 +8,11 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
-import com.example.gd8_a_0833.AddEditActivity
-import com.example.gd8_a_0833.MainActivity
-import com.example.gd8_a_0833.R
+import com.example.gd13_a_0833.AddEditActivity
+import com.example.gd13_a_0833.MainActivity
+import com.example.gd13_a_0833.R
 import java.util.*
-import com.example.gd8_a_0833.models.Mahasiswa
+import com.example.gd13_a_0833.models.Mahasiswa
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class MahasiswaAdapter (private var mahasiswaList: List<Mahasiswa>, context: Context):

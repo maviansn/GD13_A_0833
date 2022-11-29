@@ -1,7 +1,7 @@
-package com.example.gd8_a_0833
+package com.example.gd13_a_0833
 
 import android.content.Intent
-import com.example.gd8_a_0833.api.MahasiswaApi
+import com.example.gd13_a_0833.api.MahasiswaApi
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
@@ -12,7 +12,7 @@ import com.android.volley.RequestQueue
 import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
-import com.example.gd8_a_0833.models.Mahasiswa
+import com.example.gd13_a_0833.models.Mahasiswa
 import com.google.gson.Gson
 import org.json.JSONObject
 import java.lang.Exception
@@ -45,8 +45,8 @@ class AddEditActivity : AppCompatActivity() {
         queue = Volley.newRequestQueue(this)
         etNama = findViewById(R.id.et_nama)
         etNPM = findViewById(R.id.et_npm)
-        edFakultas = findViewById(R.id.et_fakultas)
-        edProdi = findViewById(R.id.et_prodi)
+        edFakultas = findViewById(R.id.ed_fakultas)
+        edProdi = findViewById(R.id.ed_prodi)
         layoutLoading = findViewById(R.id.layout_loading)
 
         setExposedDropDownMenu()
@@ -58,7 +58,7 @@ class AddEditActivity : AppCompatActivity() {
         val id = intent.getLongExtra("id" , -1)
         if(id == -1L){
             tvTitle.setText("Tambah mahasiswa")
-            btnSave.setOnClickListener{createMahasiswa()}
+                btnSave.setOnClickListener{createMahasiswa()}
         }else{
             tvTitle.setText("Edit Mahasiswa")
             getMahasiswaById(id)
@@ -112,54 +112,71 @@ class AddEditActivity : AppCompatActivity() {
 
     private fun createMahasiswa(){
         setLoading(true)
-        val mahasiswa = Mahasiswa(
-            etNama!!.text.toString(),
-            etNPM!!.text.toString(),
-            edFakultas!!.text.toString(),
-            edProdi!!.text.toString()
-        )
 
-        val stringRequest: StringRequest =
-            object : StringRequest(Method.POST, MahasiswaApi.ADD_URL, Response.Listener { response ->
-                val gson = Gson()
-                val mahasiswa = gson.fromJson(response, Mahasiswa::class.java)
+        if(etNama!!.text.toString().isEmpty()){
+            Toast.makeText(this,"Nama tidak boleh kosong!", Toast.LENGTH_SHORT).show()
+        }else if(etNPM!!.text.toString().isEmpty()){
+            Toast.makeText(this,"NPM tidak boleh kosong!", Toast.LENGTH_SHORT).show()
+        }else if(edFakultas!!.text.toString().isEmpty()){
+            Toast.makeText(this,"Fakultas tidak boleh kosong!", Toast.LENGTH_SHORT).show()
+        }else if(edProdi!!.text.toString().isEmpty()){
+            Toast.makeText(this,"Prodi tidak boleh kosong!", Toast.LENGTH_SHORT).show()
+        }else {
+            val mahasiswa = Mahasiswa(
+                etNama!!.text.toString(),
+                etNPM!!.text.toString(),
+                edFakultas!!.text.toString(),
+                edProdi!!.text.toString()
+            )
 
-                if(mahasiswa != null)
-                    Toast.makeText(this,"Data berhasil ditambahkan",Toast.LENGTH_SHORT).show()
+            val stringRequest: StringRequest =
+                object :
+                    StringRequest(Method.POST, MahasiswaApi.ADD_URL, Response.Listener { response ->
+                        val gson = Gson()
+                        val mahasiswa = gson.fromJson(response, Mahasiswa::class.java)
 
-                val returnIntent = Intent()
-                setResult(RESULT_OK,returnIntent)
-                finish()
+                        if (mahasiswa != null)
+                            Toast.makeText(this, "Data berhasil ditambahkan", Toast.LENGTH_SHORT)
+                                .show()
 
-                setLoading(false)
-            },Response.ErrorListener { error ->
-                setLoading(false)
-                try{
-                    val responseBody = String(error.networkResponse.data, StandardCharsets.UTF_8)
-                    val errors = JSONObject(responseBody)
-                    Toast.makeText(this,errors.getString("message"),Toast.LENGTH_SHORT).show()
-                }catch (e: Exception){
-                    Toast.makeText(this,e.message,Toast.LENGTH_SHORT).show()
+                        val returnIntent = Intent()
+                        setResult(RESULT_OK, returnIntent)
+                        finish()
+
+                        setLoading(false)
+                    }, Response.ErrorListener { error ->
+                        setLoading(false)
+                        try {
+                            val responseBody =
+                                String(error.networkResponse.data, StandardCharsets.UTF_8)
+                            val errors = JSONObject(responseBody)
+                            Toast.makeText(this, errors.getString("message"), Toast.LENGTH_SHORT)
+                                .show()
+                        } catch (e: Exception) {
+                            Toast.makeText(this, e.message, Toast.LENGTH_SHORT).show()
+                        }
+                    }) {
+                    @Throws(AuthFailureError::class)
+                    override fun getHeaders(): Map<String, String> {
+                        val headers = HashMap<String, String>()
+                        headers["Accept"] = "application/json"
+                        return headers
+                    }
+
+                    @Throws(AuthFailureError::class)
+                    override fun getBody(): ByteArray {
+                        val gson = Gson()
+                        val requestBody = gson.toJson(mahasiswa)
+                        return requestBody.toByteArray(StandardCharsets.UTF_8)
+                    }
+
+                    override fun getBodyContentType(): String {
+                        return "application/json"
+                    }
                 }
-            }){
-                @Throws(AuthFailureError::class)
-                override fun getHeaders(): Map<String, String> {
-                    val headers = HashMap<String,String>()
-                    headers["Accept"] = "application/json"
-                    return headers
-                }
-                @Throws(AuthFailureError::class)
-                override fun getBody(): ByteArray {
-                    val gson = Gson()
-                    val requestBody = gson.toJson(mahasiswa)
-                    return requestBody.toByteArray(StandardCharsets.UTF_8)
-                }
-
-                override fun getBodyContentType(): String {
-                    return "application/json"
-                }
-            }
-        queue!!.add(stringRequest)
+            queue!!.add(stringRequest)
+        }
+        setLoading(false)
     }
 
     private fun updateMahasiwa(id: Long){

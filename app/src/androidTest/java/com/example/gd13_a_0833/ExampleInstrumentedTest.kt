@@ -1,4 +1,4 @@
-package com.example.gd8_a_0833
+package com.example.gd13_a_0833
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4
